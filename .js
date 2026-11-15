@@ -8,12 +8,45 @@ var e,t,i="function"==typeof Symbol?Symbol:{},n=i.iterator||"@@iterator",a=i.toS
   var poweredById = "aasif-youtube-powered-by";
   var splashId = "aasif-youtube-startup-splash";
   var splashSeenKey = "aasif-youtube-startup-seen-v4";
+  var playerKeepAliveTimer = null;
 
   function videoPlayerIsVisible(){
     var player = document.querySelector("ytlr-player") || document.querySelector(".html5-video-player");
     if (!player) return false;
     var rect = player.getBoundingClientRect();
     return rect.width > window.innerWidth * 0.75 && rect.height > window.innerHeight * 0.55;
+  }
+
+  function refreshPlayerControls(){
+    if (!videoPlayerIsVisible()) return;
+    var player = document.querySelector("ytlr-player") || document.querySelector(".html5-video-player");
+    if (!player) return;
+    var rect = player.getBoundingClientRect();
+    var activity = new MouseEvent("mousemove", {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      clientX: rect.left + rect.width / 2,
+      clientY: rect.top + rect.height / 2
+    });
+    player.dispatchEvent(activity);
+  }
+
+  function keepControlsVisibleAfterRight(event){
+    var right = event.key === "ArrowRight" || event.keyCode === 22 || event.keyCode === 39;
+    if (!right || !videoPlayerIsVisible()) return;
+    if (playerKeepAliveTimer) window.clearTimeout(playerKeepAliveTimer);
+
+    var deadline = Date.now() + 3200;
+    function refreshUntilDeadline(){
+      refreshPlayerControls();
+      if (Date.now() < deadline) {
+        playerKeepAliveTimer = window.setTimeout(refreshUntilDeadline, 550);
+      } else {
+        playerKeepAliveTimer = null;
+      }
+    }
+    playerKeepAliveTimer = window.setTimeout(refreshUntilDeadline, 80);
   }
 
   function isHomePage(){
@@ -161,6 +194,7 @@ var e,t,i="function"==typeof Symbol?Symbol:{},n=i.iterator||"@@iterator",a=i.toS
     } catch (error) {}
     window.addEventListener("resize", ensurePoweredBy);
     window.addEventListener("hashchange", ensurePoweredBy);
+    document.addEventListener("keydown", keepControlsVisibleAfterRight, true);
     window.setInterval(ensurePoweredBy, 1200);
   }
 
