@@ -16,6 +16,10 @@ var e,t,i="function"==typeof Symbol?Symbol:{},n=i.iterator||"@@iterator",a=i.toS
     return rect.width > window.innerWidth * 0.75 && rect.height > window.innerHeight * 0.55;
   }
 
+  function isHomePage(){
+    return (window.location.hash || "").toLowerCase().indexOf("fewhat_to_watch") !== -1;
+  }
+
   function ensurePoweredBy(){
     if (!document.body) return;
     var label = document.getElementById(poweredById);
@@ -42,7 +46,7 @@ var e,t,i="function"==typeof Symbol?Symbol:{},n=i.iterator||"@@iterator",a=i.toS
       label.style.pointerEvents = "none";
       document.body.appendChild(label);
     }
-    label.style.display = videoPlayerIsVisible() ? "none" : "block";
+    label.style.display = isHomePage() && !videoPlayerIsVisible() ? "block" : "none";
   }
 
   function showStartupLogo(){
@@ -96,6 +100,7 @@ var e,t,i="function"==typeof Symbol?Symbol:{},n=i.iterator||"@@iterator",a=i.toS
       new MutationObserver(ensurePoweredBy).observe(document.body, {childList:true, subtree:true});
     } catch (error) {}
     window.addEventListener("resize", ensurePoweredBy);
+    window.addEventListener("hashchange", ensurePoweredBy);
     window.setInterval(ensurePoweredBy, 1200);
   }
 
