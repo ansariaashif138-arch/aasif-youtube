@@ -17,7 +17,9 @@ var e,t,i="function"==typeof Symbol?Symbol:{},n=i.iterator||"@@iterator",a=i.toS
   }
 
   function isHomePage(){
-    return (window.location.hash || "").toLowerCase().indexOf("fewhat_to_watch") !== -1;
+    var hash = (window.location.hash || "").toLowerCase();
+    if (hash.indexOf("fewhat_to_watch") !== -1) return true;
+    return hash === "#/" && !!document.body && document.body.textContent.indexOf("Recommended") !== -1;
   }
 
   function ensurePoweredBy(){
@@ -51,7 +53,7 @@ var e,t,i="function"==typeof Symbol?Symbol:{},n=i.iterator||"@@iterator",a=i.toS
 
   function showStartupLogo(){
     try {
-      if (sessionStorage.getItem("aasif-youtube-startup-seen") === "1") return;
+      if (sessionStorage.getItem("aasif-youtube-startup-seen-v2") === "1") return;
     } catch (error) {}
     if (!document.body || document.getElementById(splashId)) return;
 
@@ -84,7 +86,7 @@ var e,t,i="function"==typeof Symbol?Symbol:{},n=i.iterator||"@@iterator",a=i.toS
       splash.style.opacity = "0";
       window.setTimeout(function(){
         if (splash.parentNode) splash.parentNode.removeChild(splash);
-        try { sessionStorage.setItem("aasif-youtube-startup-seen", "1"); } catch (error) {}
+        try { sessionStorage.setItem("aasif-youtube-startup-seen-v2", "1"); } catch (error) {}
       }, 320);
     }, 850);
   }
